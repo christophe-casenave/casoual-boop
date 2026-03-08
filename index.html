@@ -172,6 +172,46 @@
       font-weight: 700;
     }
 
+    .like-btn {
+      background: none;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 30px;
+      padding: 10px 24px;
+      color: rgba(255,255,255,0.5);
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+    .like-btn.liked {
+      border-color: #ff6b6b;
+      color: #ff6b6b;
+      background: rgba(255,107,107,0.1);
+    }
+
+    .back-link {
+      font-size: 14px;
+      opacity: 0.4;
+      text-decoration: none;
+      color: white;
+      transition: opacity 0.2s;
+    }
+    .back-link:hover { opacity: 0.7; }
+
+    .hud-back {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      font-size: 13px;
+      opacity: 0.25;
+      text-decoration: none;
+      color: white;
+      z-index: 20;
+      transition: opacity 0.2s;
+    }
+    .hud-back:hover { opacity: 0.6; }
+
     /* ── AD ── */
     .ad-container {
       margin: 16px 0;
@@ -229,6 +269,7 @@
 
   <!-- GAME -->
   <div id="game-screen" class="screen">
+    <a href="https://casoual.games" class="hud-back">← Back</a>
     <div class="game-hud">
       <div class="score-display" id="score">0</div>
       <div class="lives" id="lives"></div>
@@ -256,7 +297,9 @@
            data-full-width-responsive="true"></ins>
     </div>
     <button class="btn" id="retry-btn">Play Again</button>
+    <button class="like-btn" id="like-btn" onclick="likeGame()">♡ Like this game</button>
     <p class="best-score" id="gameover-best"></p>
+    <a href="https://casoual.games" class="back-link">← More games</a>
   </div>
 
   <script>
@@ -513,6 +556,31 @@
         showScreen('over');
         try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch(e) {}
       }, 500);
+    }
+
+    // ── LIKE ──
+    const VOTE_API = 'https://casoual.games/api/votes';
+    let hasLiked = !!localStorage.getItem('boop-liked');
+    if (hasLiked) {
+      const lb = document.getElementById('like-btn');
+      lb.classList.add('liked');
+      lb.textContent = '♥ Liked!';
+    }
+    function likeGame() {
+      if (hasLiked) return;
+      fetch(VOTE_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ game: 'boop' })
+      }).then(r => r.json()).then(data => {
+        if (!data.error) {
+          hasLiked = true;
+          localStorage.setItem('boop-liked', '1');
+          const lb = document.getElementById('like-btn');
+          lb.classList.add('liked');
+          lb.textContent = '♥ Liked!';
+        }
+      }).catch(() => {});
     }
 
     // Prevent scroll / zoom on mobile
