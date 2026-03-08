@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Boop!</title>
@@ -10,11 +10,10 @@
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7283526525669150" crossorigin="anonymous"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
     body {
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      background: #1a1a2e;
-      color: white;
+      background: #0a0a0f;
+      color: #e8e8e8;
       overflow: hidden;
       touch-action: manipulation;
       user-select: none;
@@ -22,9 +21,14 @@
       height: 100dvh;
       width: 100vw;
     }
-
-    /* ── SCREENS ── */
-    .screen {
+    canvas {
+      display: block;
+      width: 100vw;
+      height: 100dvh;
+      position: absolute;
+      top: 0; left: 0;
+    }
+    .overlay {
       display: none;
       flex-direction: column;
       align-items: center;
@@ -33,152 +37,60 @@
       width: 100vw;
       position: absolute;
       top: 0; left: 0;
+      z-index: 10;
+      pointer-events: auto;
     }
-    .screen.active { display: flex; }
-
-    /* ── MENU ── */
-    #menu-screen {
-      gap: 30px;
-    }
+    .overlay.active { display: flex; }
+    #menu-screen { gap: 24px; }
     #menu-screen h1 {
       font-size: 72px;
       font-weight: 900;
       letter-spacing: -2px;
+      background: linear-gradient(135deg, #ff6b6b, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
-    #menu-screen h1 span {
-      color: #ff6b6b;
-    }
-    .subtitle {
-      font-size: 16px;
-      opacity: 0.5;
-      margin-top: -20px;
-    }
+    .subtitle { font-size: 15px; color: rgba(255,255,255,0.4); margin-top: -12px; }
     .btn {
-      background: #ff6b6b;
+      background: linear-gradient(135deg, #ff6b6b, #a855f7);
       border: none;
       color: white;
-      font-size: 24px;
+      font-size: 22px;
       font-weight: 700;
-      padding: 16px 48px;
+      padding: 14px 52px;
       border-radius: 50px;
       cursor: pointer;
-      transition: transform 0.1s, background 0.1s;
+      font-family: inherit;
+      transition: transform 0.1s;
     }
-    .btn:active {
-      transform: scale(0.95);
-    }
-    .best-score {
-      font-size: 18px;
-      opacity: 0.6;
-    }
-
-    /* ── GAME ── */
-    #game-screen {
-      justify-content: flex-start;
-    }
-
-    .game-hud {
-      width: 100%;
-      padding: 16px 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      z-index: 10;
-    }
-    .score-display {
-      font-size: 28px;
-      font-weight: 800;
-    }
-    .combo-display {
-      font-size: 18px;
-      font-weight: 600;
-      opacity: 0.7;
-    }
-
-    .target-zone {
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      padding: 12px 0 20px;
-      z-index: 10;
-    }
-    .target-circle {
-      width: 70px;
-      height: 70px;
-      border-radius: 50%;
-      border: 4px solid rgba(255,255,255,0.3);
-      transition: background 0.15s;
-    }
-    .target-label {
-      font-size: 13px;
-      opacity: 0.4;
-      margin-top: 8px;
-      text-align: center;
-    }
-
-    .game-area {
-      flex: 1;
-      width: 100%;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .bubble {
-      position: absolute;
-      border-radius: 50%;
-      cursor: pointer;
-      transition: transform 0.08s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .bubble:active {
-      transform: scale(0.85);
-    }
-
-    .lives {
-      display: flex;
-      gap: 6px;
-    }
-    .life-dot {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: #ff6b6b;
-      transition: opacity 0.3s, transform 0.3s;
-    }
-    .life-dot.lost {
-      opacity: 0.2;
-      transform: scale(0.6);
-    }
-
-    /* ── GAME OVER ── */
-    #gameover-screen {
-      gap: 24px;
-      background: rgba(26, 26, 46, 0.95);
-    }
-    .final-score-label {
-      font-size: 20px;
-      opacity: 0.6;
-    }
+    .btn:active { transform: scale(0.95); }
+    .best-score { font-size: 16px; color: rgba(255,255,255,0.4); }
+    #gameover-screen { gap: 20px; background: rgba(10,10,15,0.92); }
+    .final-score-label { font-size: 18px; color: rgba(255,255,255,0.5); }
     .final-score {
-      font-size: 80px;
+      font-size: 76px;
       font-weight: 900;
-      color: #ff6b6b;
+      background: linear-gradient(135deg, #ff6b6b, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
-    .new-best {
-      font-size: 18px;
-      color: #ffd93d;
-      font-weight: 700;
+    .new-best { font-size: 16px; color: #ffd93d; font-weight: 700; }
+    .ad-container {
+      margin: 10px 0;
+      min-height: 250px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-
     .like-btn {
       background: none;
       border: 1px solid rgba(255,255,255,0.15);
       border-radius: 30px;
       padding: 10px 24px;
       color: rgba(255,255,255,0.5);
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 600;
       cursor: pointer;
       font-family: inherit;
@@ -189,103 +101,29 @@
       color: #ff6b6b;
       background: rgba(255,107,107,0.1);
     }
-
     .back-link {
-      font-size: 14px;
-      opacity: 0.4;
-      text-decoration: none;
-      color: white;
-      transition: opacity 0.2s;
-    }
-    .back-link:hover { opacity: 0.7; }
-
-    .hud-back {
-      position: absolute;
-      top: 16px;
-      left: 16px;
       font-size: 13px;
-      opacity: 0.25;
+      color: rgba(255,255,255,0.35);
       text-decoration: none;
-      color: white;
-      z-index: 20;
-      transition: opacity 0.2s;
+      transition: color 0.2s;
     }
-    .hud-back:hover { opacity: 0.6; }
-
-    /* ── AD ── */
-    .ad-container {
-      margin: 16px 0;
-      min-height: 250px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    /* ── EFFECTS ── */
-    .pop-effect {
-      position: absolute;
-      border-radius: 50%;
-      pointer-events: none;
-      animation: pop 0.4s ease-out forwards;
-    }
-    @keyframes pop {
-      0% { transform: scale(1); opacity: 0.6; }
-      100% { transform: scale(2.5); opacity: 0; }
-    }
-
-    .miss-flash {
-      animation: flash-red 0.3s;
-    }
-    @keyframes flash-red {
-      0%, 100% { background: #1a1a2e; }
-      50% { background: #3a1a1a; }
-    }
-
-    .score-float {
-      position: absolute;
-      font-size: 24px;
-      font-weight: 800;
-      color: white;
-      pointer-events: none;
-      animation: float-up 0.6s ease-out forwards;
-      z-index: 100;
-    }
-    @keyframes float-up {
-      0% { opacity: 1; transform: translateY(0) scale(1); }
-      100% { opacity: 0; transform: translateY(-60px) scale(1.3); }
-    }
+    .back-link:hover { color: rgba(255,255,255,0.6); }
   </style>
 </head>
 <body>
+  <canvas id="gc"></canvas>
 
   <!-- MENU -->
-  <div id="menu-screen" class="screen active">
-    <a href="https://casoual.games" style="font-size:14px;opacity:0.4;text-decoration:none;color:white;margin-bottom:8px;">← Casoual Games</a>
-    <h1>Boop<span>!</span></h1>
-    <p class="subtitle">by Casoual Games</p>
+  <div id="menu-screen" class="overlay active">
+    <a href="https://casoual.games" class="back-link" style="margin-bottom:8px">&#8592; Casoual Games</a>
+    <h1>Boop!</h1>
+    <p class="subtitle">Tap the right color. Stay alive.</p>
     <button class="btn" id="play-btn">Play</button>
     <p class="best-score" id="menu-best"></p>
   </div>
 
-  <!-- GAME -->
-  <div id="game-screen" class="screen">
-    <a href="https://casoual.games" class="hud-back">← Back</a>
-    <div class="game-hud">
-      <div class="score-display" id="score">0</div>
-      <div class="lives" id="lives"></div>
-    </div>
-    <div class="target-zone">
-      <div>
-        <div class="target-circle" id="target"></div>
-        <div class="target-label">TAP THIS COLOR</div>
-      </div>
-    </div>
-    <div class="combo-display" id="combo"></div>
-    <div class="game-area" id="game-area"></div>
-  </div>
-
   <!-- GAME OVER -->
-  <div id="gameover-screen" class="screen">
+  <div id="gameover-screen" class="overlay">
     <p class="final-score-label">Score</p>
     <p class="final-score" id="final-score">0</p>
     <p class="new-best" id="new-best" style="display:none">NEW BEST!</p>
@@ -297,296 +135,996 @@
            data-full-width-responsive="true"></ins>
     </div>
     <button class="btn" id="retry-btn">Play Again</button>
-    <button class="like-btn" id="like-btn" onclick="likeGame()">♡ Like this game</button>
+    <button class="like-btn" id="like-btn">&#9825; Like this game</button>
     <p class="best-score" id="gameover-best"></p>
-    <a href="https://casoual.games" class="back-link">← More games</a>
+    <a href="https://casoual.games" class="back-link">&#8592; More games</a>
   </div>
 
   <script>
-    // ── COLORS ──
-    const COLORS = [
-      { name: 'red',    hex: '#ff6b6b' },
-      { name: 'blue',   hex: '#4ecdc4' },
-      { name: 'yellow', hex: '#ffd93d' },
-      { name: 'purple', hex: '#a855f7' },
-      { name: 'green',  hex: '#22c55e' },
-      { name: 'orange', hex: '#ff922b' },
-    ];
+  'use strict';
+  // =====================================================================
+  // BOOP! — Tap the right color. Stay alive.
+  // A Casoual Games production. Single-file canvas game.
+  // =====================================================================
 
-    // ── STATE ──
-    let score = 0;
-    let combo = 0;
-    let lives = 3;
-    let targetColor = null;
-    let bubbles = [];
-    let gameLoop = null;
-    let spawnLoop = null;
-    let speed = 1;
-    let gameActive = false;
-    let bestScore = parseInt(localStorage.getItem('boop-best') || '0');
+  // -- CONSTANTS --------------------------------------------------------
+  const BG = '#0a0a0f';
+  const COLORS = [
+    { name: 'coral',   hex: '#ff6b6b', r: 255, g: 107, b: 107 },
+    { name: 'teal',    hex: '#4ecdc4', r: 78,  g: 205, b: 196 },
+    { name: 'gold',    hex: '#ffd93d', r: 255, g: 217, b: 61  },
+    { name: 'violet',  hex: '#a855f7', r: 168, g: 85,  b: 247 },
+    { name: 'green',   hex: '#22c55e', r: 34,  g: 197, b: 94  },
+    { name: 'orange',  hex: '#ff922b', r: 255, g: 146, b: 43  },
+  ];
+  const MAX_LIVES = 3;
+  const PENTATONIC = [523.25, 587.33, 659.25, 783.99, 880.00]; // C penta oct5
+  const PENTATONIC_LOW = [261.63, 293.66, 329.63, 392.00, 440.00]; // oct4
+  const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    // ── DOM ──
-    const $ = id => document.getElementById(id);
-    const screens = {
-      menu: $('menu-screen'),
-      game: $('game-screen'),
-      over: $('gameover-screen'),
-    };
+  // -- CANVAS SETUP -----------------------------------------------------
+  const canvas = document.getElementById('gc');
+  const ctx = canvas.getContext('2d');
+  let W, H, DPR;
 
-    function showScreen(name) {
-      Object.values(screens).forEach(s => s.classList.remove('active'));
-      screens[name].classList.add('active');
-    }
+  function resizeCanvas() {
+    DPR = window.devicePixelRatio || 1;
+    W = window.innerWidth;
+    H = window.innerHeight;
+    canvas.width = W * DPR;
+    canvas.height = H * DPR;
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
 
-    // ── MENU ──
-    function updateBestDisplay() {
-      const text = bestScore > 0 ? `Best: ${bestScore}` : '';
-      $('menu-best').textContent = text;
-      $('gameover-best').textContent = text;
-    }
-    updateBestDisplay();
+  // -- SOUND ENGINE (Web Audio API, procedural) -------------------------
+  const Sound = {
+    ctx: null,
+    comp: null,
+    comboIndex: 0,
 
-    $('play-btn').addEventListener('click', startGame);
-    $('retry-btn').addEventListener('click', startGame);
+    init() {
+      if (this.ctx) { this.ctx.resume(); return; }
+      this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+      this.comp = this.ctx.createDynamicsCompressor();
+      this.comp.threshold.value = -24;
+      this.comp.ratio.value = 12;
+      this.comp.connect(this.ctx.destination);
+    },
 
-    // ── GAME START ──
-    function startGame() {
-      score = 0;
-      combo = 0;
-      lives = 3;
-      speed = 1;
-      bubbles = [];
-      gameActive = true;
+    _play(freq, type, dur, env, vol) {
+      if (!this.ctx || this.ctx.state !== 'running') return;
+      const c = this.ctx;
+      const t = c.currentTime;
+      const detune = 0.95 + Math.random() * 0.1;
+      const osc = c.createOscillator();
+      const gain = c.createGain();
+      osc.type = type;
+      osc.frequency.value = freq * detune;
+      const v = (vol || 0.25) * (0.9 + Math.random() * 0.2);
+      gain.gain.setValueAtTime(0.0001, t);
+      gain.gain.linearRampToValueAtTime(v, t + env.a);
+      gain.gain.linearRampToValueAtTime(v * env.s, t + env.a + env.d);
+      gain.gain.setValueAtTime(v * env.s, t + dur - env.r);
+      gain.gain.linearRampToValueAtTime(0.0001, t + dur);
+      osc.connect(gain);
+      gain.connect(this.comp);
+      osc.start(t);
+      osc.stop(t + dur + 0.01);
+    },
 
-      $('score').textContent = '0';
-      $('combo').textContent = '';
-      $('game-area').innerHTML = '';
-      renderLives();
-      pickNewTarget();
-      showScreen('game');
+    pop(comboN) {
+      // Walk up pentatonic on combo
+      const idx = comboN % PENTATONIC.length;
+      this._play(PENTATONIC[idx], 'sine', 0.15, { a: 0.002, d: 0.06, s: 0, r: 0.08 }, 0.28);
+      // Bright harmonic layer
+      this._play(PENTATONIC[idx] * 2, 'sine', 0.1, { a: 0.002, d: 0.04, s: 0, r: 0.05 }, 0.08);
+    },
 
-      // Game loop — move bubbles
-      clearInterval(gameLoop);
-      gameLoop = setInterval(updateBubbles, 16);
+    wrong() {
+      // Soft descending tone
+      if (!this.ctx || this.ctx.state !== 'running') return;
+      const c = this.ctx;
+      const t = c.currentTime;
+      const osc = c.createOscillator();
+      const gain = c.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(440, t);
+      osc.frequency.exponentialRampToValueAtTime(180, t + 0.3);
+      gain.gain.setValueAtTime(0.0001, t);
+      gain.gain.linearRampToValueAtTime(0.2, t + 0.005);
+      gain.gain.linearRampToValueAtTime(0.0001, t + 0.35);
+      osc.connect(gain);
+      gain.connect(this.comp);
+      osc.start(t);
+      osc.stop(t + 0.4);
+    },
 
-      // Spawn loop
-      clearInterval(spawnLoop);
-      scheduleSpawn();
-    }
+    miss() {
+      // Near-miss warning — quick descending blip
+      this._play(330, 'square', 0.12, { a: 0.003, d: 0.06, s: 0, r: 0.05 }, 0.1);
+    },
 
-    function scheduleSpawn() {
-      const delay = Math.max(400, 1200 - score * 8);
-      spawnLoop = setTimeout(() => {
-        if (gameActive) {
-          spawnBubble();
-          scheduleSpawn();
-        }
-      }, delay);
-    }
-
-    // ── TARGET ──
-    function pickNewTarget() {
-      targetColor = COLORS[Math.floor(Math.random() * Math.min(3 + Math.floor(score / 15), COLORS.length))];
-      $('target').style.background = targetColor.hex;
-    }
-
-    // ── LIVES ──
-    function renderLives() {
-      const el = $('lives');
-      el.innerHTML = '';
+    death() {
+      if (!this.ctx || this.ctx.state !== 'running') return;
+      const c = this.ctx;
+      const t = c.currentTime;
       for (let i = 0; i < 3; i++) {
-        const dot = document.createElement('div');
-        dot.className = 'life-dot' + (i >= lives ? ' lost' : '');
-        el.appendChild(dot);
+        const osc = c.createOscillator();
+        const gain = c.createGain();
+        osc.type = 'square';
+        const start = 400 - i * 80;
+        osc.frequency.setValueAtTime(start, t + i * 0.12);
+        osc.frequency.exponentialRampToValueAtTime(start * 0.4, t + i * 0.12 + 0.25);
+        gain.gain.setValueAtTime(0.0001, t + i * 0.12);
+        gain.gain.linearRampToValueAtTime(0.12, t + i * 0.12 + 0.005);
+        gain.gain.linearRampToValueAtTime(0.0001, t + i * 0.12 + 0.3);
+        osc.connect(gain);
+        gain.connect(this.comp);
+        osc.start(t + i * 0.12);
+        osc.stop(t + i * 0.12 + 0.35);
       }
+    },
+
+    ui() {
+      this._play(PENTATONIC_LOW[2], 'triangle', 0.08, { a: 0.001, d: 0.04, s: 0, r: 0.04 }, 0.12);
     }
+  };
 
-    // ── SPAWN BUBBLE ──
-    function spawnBubble() {
-      if (!gameActive) return;
-      const area = $('game-area');
-      const rect = area.getBoundingClientRect();
-
-      const size = 50 + Math.random() * 20;
-      const color = COLORS[Math.floor(Math.random() * Math.min(3 + Math.floor(score / 15), COLORS.length))];
-      const x = Math.random() * (rect.width - size);
-
-      const el = document.createElement('div');
-      el.className = 'bubble';
-      el.style.width = size + 'px';
-      el.style.height = size + 'px';
-      el.style.background = color.hex;
-      el.style.left = x + 'px';
-      el.style.top = '-' + size + 'px';
-
-      const bubble = { el, color, y: -size, size, x, speed: (1.5 + Math.random()) * speed };
-
-      // Tap handler
-      el.addEventListener('pointerdown', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        tapBubble(bubble);
-      });
-
-      area.appendChild(el);
-      bubbles.push(bubble);
+  // -- EASING FUNCTIONS -------------------------------------------------
+  const ease = {
+    outCubic: t => 1 - Math.pow(1 - t, 3),
+    outBack: t => { const c = 1.70158; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); },
+    outElastic: t => t === 0 ? 0 : t === 1 ? 1 : Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * (2 * Math.PI) / 3) + 1,
+    outBounce: t => {
+      const n = 7.5625, d = 2.75;
+      if (t < 1 / d) return n * t * t;
+      if (t < 2 / d) return n * (t -= 1.5 / d) * t + 0.75;
+      if (t < 2.5 / d) return n * (t -= 2.25 / d) * t + 0.9375;
+      return n * (t -= 2.625 / d) * t + 0.984375;
     }
+  };
 
-    // ── TAP ──
-    function tapBubble(bubble) {
-      if (!gameActive) return;
+  // -- CAMERA (screen shake) --------------------------------------------
+  const camera = {
+    trauma: 0,
+    shakeX: 0,
+    shakeY: 0,
 
-      if (bubble.color.name === targetColor.name) {
-        // Correct!
-        combo++;
-        const points = combo >= 10 ? 3 : combo >= 5 ? 2 : 1;
-        score += points;
-        $('score').textContent = score;
-        $('combo').textContent = combo >= 3 ? `${combo}x combo!` : '';
+    addTrauma(amount) {
+      if (REDUCED_MOTION) return;
+      this.trauma = Math.min(1, this.trauma + amount);
+    },
 
-        // Speed up
-        speed = 1 + score * 0.03;
-
-        // Effects
-        showPop(bubble);
-        showScoreFloat(bubble, '+' + points);
-
-        // Remove
-        removeBubble(bubble);
-        pickNewTarget();
+    update(dt) {
+      if (this.trauma > 0.001) {
+        const shake = this.trauma * this.trauma;
+        this.shakeX = (Math.random() * 2 - 1) * shake * 12;
+        this.shakeY = (Math.random() * 2 - 1) * shake * 12;
+        this.trauma = Math.max(0, this.trauma - dt * 3);
       } else {
-        // Wrong!
-        loseLife();
-        shakeBubble(bubble);
+        this.shakeX = 0;
+        this.shakeY = 0;
+        this.trauma = 0;
       }
     }
+  };
 
-    // ── MISS (bubble goes off screen) ──
-    function missBubble(bubble) {
-      if (bubble.color.name === targetColor.name) {
-        // Missed the target color — lose a life
-        loseLife();
-      }
-      removeBubble(bubble);
+  // -- PARTICLE POOL (object-pooled) ------------------------------------
+  const MAX_PARTICLES = 300;
+  const particles = [];
+  for (let i = 0; i < MAX_PARTICLES; i++) {
+    particles.push({ active: false, x: 0, y: 0, vx: 0, vy: 0, life: 0, maxLife: 0, size: 0, color: '', alpha: 1, type: 'circle' });
+  }
+
+  function emitParticles(x, y, count, config) {
+    let spawned = 0;
+    for (let i = 0; i < MAX_PARTICLES && spawned < count; i++) {
+      const p = particles[i];
+      if (p.active) continue;
+      p.active = true;
+      p.x = x;
+      p.y = y;
+      const angle = Math.random() * Math.PI * 2;
+      const spd = (config.speed || 150) * (0.3 + Math.random() * 0.7);
+      p.vx = Math.cos(angle) * spd;
+      p.vy = Math.sin(angle) * spd - (config.upward || 0);
+      p.life = 0;
+      p.maxLife = (config.life || 0.4) + Math.random() * (config.lifeVar || 0.2);
+      p.size = (config.size || 4) + Math.random() * (config.sizeVar || 3);
+      p.color = config.colors[Math.floor(Math.random() * config.colors.length)];
+      p.gravity = config.gravity !== undefined ? config.gravity : 300;
+      p.type = config.type || 'circle';
+      spawned++;
     }
+  }
 
-    function loseLife() {
-      lives--;
-      combo = 0;
-      $('combo').textContent = '';
-      renderLives();
-      document.body.classList.add('miss-flash');
-      setTimeout(() => document.body.classList.remove('miss-flash'), 300);
-
-      if (lives <= 0) {
-        endGame();
-      }
+  function updateParticles(dt) {
+    for (let i = 0; i < MAX_PARTICLES; i++) {
+      const p = particles[i];
+      if (!p.active) continue;
+      p.life += dt;
+      if (p.life >= p.maxLife) { p.active = false; continue; }
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+      p.vy += p.gravity * dt;
+      p.alpha = 1 - (p.life / p.maxLife);
     }
+  }
 
-    // ── EFFECTS ──
-    function showPop(bubble) {
-      const area = $('game-area');
-      const pop = document.createElement('div');
-      pop.className = 'pop-effect';
-      pop.style.width = bubble.size + 'px';
-      pop.style.height = bubble.size + 'px';
-      pop.style.left = bubble.x + 'px';
-      pop.style.top = bubble.y + 'px';
-      pop.style.background = bubble.color.hex;
-      area.appendChild(pop);
-      setTimeout(() => pop.remove(), 400);
-    }
-
-    function showScoreFloat(bubble, text) {
-      const area = $('game-area');
-      const float = document.createElement('div');
-      float.className = 'score-float';
-      float.textContent = text;
-      float.style.left = (bubble.x + bubble.size / 2 - 15) + 'px';
-      float.style.top = bubble.y + 'px';
-      area.appendChild(float);
-      setTimeout(() => float.remove(), 600);
-    }
-
-    function shakeBubble(bubble) {
-      bubble.el.style.animation = 'none';
-      bubble.el.offsetHeight; // reflow
-      bubble.el.style.animation = 'shake 0.3s';
-    }
-
-    // ── UPDATE ──
-    function updateBubbles() {
-      if (!gameActive) return;
-      const area = $('game-area');
-      const areaHeight = area.getBoundingClientRect().height;
-
-      for (let i = bubbles.length - 1; i >= 0; i--) {
-        const b = bubbles[i];
-        b.y += b.speed;
-        b.el.style.top = b.y + 'px';
-
-        if (b.y > areaHeight) {
-          missBubble(b);
-        }
+  function renderParticles() {
+    for (let i = 0; i < MAX_PARTICLES; i++) {
+      const p = particles[i];
+      if (!p.active) continue;
+      ctx.globalAlpha = p.alpha * 0.9;
+      ctx.fillStyle = p.color;
+      if (p.type === 'star') {
+        // Small diamond
+        const s = p.size * p.alpha;
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.life * 3);
+        ctx.fillRect(-s / 2, -s / 2, s, s);
+        ctx.restore();
+      } else {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, Math.max(0.5, p.size * p.alpha), 0, Math.PI * 2);
+        ctx.fill();
       }
     }
+    ctx.globalAlpha = 1;
+  }
 
-    function removeBubble(bubble) {
-      bubble.el.remove();
-      bubbles = bubbles.filter(b => b !== bubble);
+  // -- SCORE FLOATS (object-pooled) -------------------------------------
+  const MAX_FLOATS = 20;
+  const floats = [];
+  for (let i = 0; i < MAX_FLOATS; i++) {
+    floats.push({ active: false, x: 0, y: 0, text: '', color: '', life: 0, maxLife: 0.7, scale: 1 });
+  }
+
+  function spawnFloat(x, y, text, color) {
+    for (let i = 0; i < MAX_FLOATS; i++) {
+      const f = floats[i];
+      if (f.active) continue;
+      f.active = true;
+      f.x = x;
+      f.y = y;
+      f.text = text;
+      f.color = color || '#fff';
+      f.life = 0;
+      f.maxLife = 0.7;
+      f.scale = 1;
+      break;
+    }
+  }
+
+  function updateFloats(dt) {
+    for (let i = 0; i < MAX_FLOATS; i++) {
+      const f = floats[i];
+      if (!f.active) continue;
+      f.life += dt;
+      if (f.life >= f.maxLife) { f.active = false; continue; }
+      f.y -= 70 * dt;
+    }
+  }
+
+  function renderFloats() {
+    for (let i = 0; i < MAX_FLOATS; i++) {
+      const f = floats[i];
+      if (!f.active) continue;
+      const t = f.life / f.maxLife;
+      const alpha = 1 - ease.outCubic(t);
+      const scale = 1 + ease.outBack(Math.min(t * 3, 1)) * 0.4;
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = f.color;
+      ctx.font = `${Math.round(22 * scale)}px 'Segoe UI', system-ui, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText(f.text, f.x, f.y);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  // -- BUBBLE POOL (object-pooled) --------------------------------------
+  const MAX_BUBBLES = 40;
+  const bubbles = [];
+  for (let i = 0; i < MAX_BUBBLES; i++) {
+    bubbles.push({
+      active: false, x: 0, y: 0, radius: 0, color: null,
+      speed: 0, wobblePhase: 0, wobbleSpeed: 0,
+      popAnim: 0, popActive: false,
+      glowPhase: 0, spawnScale: 0, spawnTime: 0,
+      nearMissTriggered: false
+    });
+  }
+
+  function spawnBubble() {
+    for (let i = 0; i < MAX_BUBBLES; i++) {
+      const b = bubbles[i];
+      if (b.active || b.popActive) continue;
+      const colorCount = Math.min(3 + Math.floor(game.score / 20), COLORS.length);
+      b.active = true;
+      b.radius = 24 + Math.random() * 10;
+      b.color = COLORS[Math.floor(Math.random() * colorCount)];
+      b.x = b.radius + Math.random() * (W - b.radius * 2);
+      b.y = -b.radius * 2;
+      b.speed = (100 + Math.random() * 60) * game.speedMult;
+      b.wobblePhase = Math.random() * Math.PI * 2;
+      b.wobbleSpeed = 1.5 + Math.random() * 2;
+      b.glowPhase = Math.random() * Math.PI * 2;
+      b.popAnim = 0;
+      b.popActive = false;
+      b.spawnScale = 0;
+      b.spawnTime = 0;
+      b.nearMissTriggered = false;
+      return b;
+    }
+    return null;
+  }
+
+  // -- GAME STATE -------------------------------------------------------
+  const game = {
+    state: 'menu', // menu, playing, over
+    score: 0,
+    combo: 0,
+    lives: MAX_LIVES,
+    targetColor: null,
+    speedMult: 1,
+    elapsed: 0,
+    spawnTimer: 0,
+    spawnInterval: 1.1,
+    bestScore: parseInt(localStorage.getItem('boop-best') || '0'),
+    targetPulse: 0,
+    targetTransition: 0,
+    prevTargetColor: null,
+    hitStopTimer: 0,
+    timeDilation: 1,
+    dilationTimer: 0,
+    flashAlpha: 0,
+    flashColor: '',
+    wavePhase: 0,
+    // Ambient particles
+    ambientTimer: 0,
+  };
+
+  function pickTarget() {
+    game.prevTargetColor = game.targetColor;
+    game.targetTransition = 0;
+    const colorCount = Math.min(3 + Math.floor(game.score / 20), COLORS.length);
+    let next;
+    do {
+      next = COLORS[Math.floor(Math.random() * colorCount)];
+    } while (next === game.targetColor && colorCount > 1);
+    game.targetColor = next;
+    game.targetPulse = 1;
+  }
+
+  function resetGame() {
+    game.score = 0;
+    game.combo = 0;
+    game.lives = MAX_LIVES;
+    game.elapsed = 0;
+    game.spawnTimer = 0;
+    game.spawnInterval = 1.1;
+    game.speedMult = 1;
+    game.hitStopTimer = 0;
+    game.timeDilation = 1;
+    game.dilationTimer = 0;
+    game.flashAlpha = 0;
+    game.wavePhase = 0;
+    game.ambientTimer = 0;
+
+    for (let i = 0; i < MAX_BUBBLES; i++) {
+      bubbles[i].active = false;
+      bubbles[i].popActive = false;
+    }
+    for (let i = 0; i < MAX_PARTICLES; i++) particles[i].active = false;
+    for (let i = 0; i < MAX_FLOATS; i++) floats[i].active = false;
+
+    pickTarget();
+  }
+
+  // -- DIFFICULTY CURVE (saw-tooth + sqrt) ------------------------------
+  function getDifficulty() {
+    const t = game.elapsed;
+    // Base ramp: sqrt curve
+    const base = Math.sqrt(t * 0.008) + 1;
+    // Saw-tooth wave: 25s period
+    const period = 25;
+    const wave = (t % period) / period;
+    const sawtooth = wave * 0.25;
+    return base + sawtooth;
+  }
+
+  function getSpawnInterval() {
+    const d = getDifficulty();
+    // Starts at 1.1s, goes down to ~0.35s
+    return Math.max(0.35, 1.1 / d);
+  }
+
+  function getSpeedMult() {
+    // Asymptotic: approaches 3x, never exceeds
+    const maxSpeed = 3;
+    const baseSpeed = 1;
+    return maxSpeed - (maxSpeed - baseSpeed) * Math.exp(-0.012 * game.elapsed);
+  }
+
+  // -- HIT TESTING ------------------------------------------------------
+  function hitTest(tx, ty) {
+    // Check bubbles from front (top of array) to back
+    for (let i = MAX_BUBBLES - 1; i >= 0; i--) {
+      const b = bubbles[i];
+      if (!b.active) continue;
+      const dx = tx - b.x;
+      const dy = ty - b.y;
+      // Generous hitbox: 120% of visual radius
+      const hitR = b.radius * 1.2;
+      if (dx * dx + dy * dy <= hitR * hitR) return b;
+    }
+    return null;
+  }
+
+  // -- GAME ACTIONS -----------------------------------------------------
+  function tapCorrect(b) {
+    game.combo++;
+    const multiplier = 1 + Math.floor(game.combo / 5) * 0.5;
+    const points = Math.round(multiplier);
+    game.score += points;
+
+    // Juice: sound
+    Sound.pop(game.combo - 1);
+
+    // Juice: particles
+    emitParticles(b.x, b.y, 14, {
+      speed: 200, upward: 80, life: 0.45, lifeVar: 0.2,
+      size: 3, sizeVar: 4, gravity: 250,
+      colors: [b.color.hex, '#fff', 'rgba(255,255,255,0.6)'],
+      type: 'star'
+    });
+
+    // Juice: score float
+    const comboText = game.combo >= 5 ? `+${points} x${multiplier.toFixed(1)}` : `+${points}`;
+    spawnFloat(b.x, b.y - b.radius, comboText, b.color.hex);
+
+    // Juice: scale pop via popAnim
+    b.active = false;
+    b.popActive = true;
+    b.popAnim = 0;
+
+    // Juice: time dilation on high combo
+    if (game.combo >= 10 && game.combo % 5 === 0) {
+      game.timeDilation = 0.3;
+      game.dilationTimer = 0.15;
     }
 
-    // ── GAME OVER ──
-    function endGame() {
-      gameActive = false;
-      clearInterval(gameLoop);
-      clearTimeout(spawnLoop);
+    // Juice: flash
+    game.flashAlpha = 0.12;
+    game.flashColor = b.color.hex;
 
-      const isNewBest = score > bestScore;
-      if (isNewBest) {
-        bestScore = score;
-        localStorage.setItem('boop-best', bestScore);
-      }
+    // Speed up
+    game.speedMult = getSpeedMult();
 
-      $('final-score').textContent = score;
-      $('new-best').style.display = isNewBest ? 'block' : 'none';
+    // New target
+    pickTarget();
+  }
+
+  function tapWrong(b) {
+    Sound.wrong();
+    camera.addTrauma(0.4);
+    game.combo = 0;
+
+    // Red flash
+    game.flashAlpha = 0.25;
+    game.flashColor = '#ff2222';
+
+    // Hit stop
+    game.hitStopTimer = 0.06;
+
+    loseLife();
+  }
+
+  function missTarget(b) {
+    Sound.wrong();
+    camera.addTrauma(0.25);
+    game.combo = 0;
+    game.flashAlpha = 0.15;
+    game.flashColor = '#ff2222';
+    loseLife();
+  }
+
+  function loseLife() {
+    game.lives--;
+    if (game.lives <= 0) {
+      gameOver();
+    }
+  }
+
+  function gameOver() {
+    game.state = 'over';
+    Sound.death();
+    camera.addTrauma(0.7);
+
+    // Burst all remaining bubbles
+    for (let i = 0; i < MAX_BUBBLES; i++) {
+      const b = bubbles[i];
+      if (!b.active) continue;
+      emitParticles(b.x, b.y, 6, {
+        speed: 100, upward: 40, life: 0.3, lifeVar: 0.15,
+        size: 2, sizeVar: 2, gravity: 200,
+        colors: [b.color.hex, 'rgba(255,255,255,0.3)']
+      });
+      b.active = false;
+    }
+
+    const isNewBest = game.score > game.bestScore;
+    if (isNewBest) {
+      game.bestScore = game.score;
+      localStorage.setItem('boop-best', String(game.bestScore));
+    }
+
+    // Show game over screen after brief delay (death-to-retry < 500ms)
+    setTimeout(() => {
+      document.getElementById('final-score').textContent = game.score;
+      document.getElementById('new-best').style.display = isNewBest ? 'block' : 'none';
       updateBestDisplay();
+      showOverlay('gameover-screen');
+      try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch (e) {}
+    }, 350);
+  }
 
-      setTimeout(() => {
-        showScreen('over');
-        try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch(e) {}
-      }, 500);
+  // -- OVERLAY MANAGEMENT -----------------------------------------------
+  function showOverlay(id) {
+    document.getElementById('menu-screen').classList.remove('active');
+    document.getElementById('gameover-screen').classList.remove('active');
+    if (id) document.getElementById(id).classList.add('active');
+  }
+
+  function updateBestDisplay() {
+    const text = game.bestScore > 0 ? `Best: ${game.bestScore}` : '';
+    document.getElementById('menu-best').textContent = text;
+    document.getElementById('gameover-best').textContent = text;
+  }
+  updateBestDisplay();
+
+  // -- INPUT HANDLING ---------------------------------------------------
+  function onInput(e) {
+    e.preventDefault();
+    Sound.init();
+
+    if (game.state !== 'playing') return;
+
+    let cx, cy;
+    if (e.touches) {
+      cx = e.touches[0].clientX;
+      cy = e.touches[0].clientY;
+    } else {
+      cx = e.clientX;
+      cy = e.clientY;
     }
 
-    // ── LIKE ──
-    const VOTE_API = 'https://casoual.games/api/votes';
-    let hasLiked = !!localStorage.getItem('boop-liked');
+    // Transform to canvas logical coords
+    const rect = canvas.getBoundingClientRect();
+    const x = (cx - rect.left) * (W / rect.width);
+    const y = (cy - rect.top) * (H / rect.height);
+
+    const hit = hitTest(x, y);
+    if (hit) {
+      if (hit.color === game.targetColor) {
+        tapCorrect(hit);
+      } else {
+        tapWrong(hit);
+      }
+    }
+  }
+
+  canvas.addEventListener('touchstart', onInput, { passive: false });
+  canvas.addEventListener('mousedown', onInput);
+
+  // Prevent scroll / zoom
+  document.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
+
+  // -- BUTTONS ----------------------------------------------------------
+  document.getElementById('play-btn').addEventListener('click', () => {
+    Sound.init();
+    Sound.ui();
+    resetGame();
+    game.state = 'playing';
+    showOverlay(null);
+  });
+
+  document.getElementById('retry-btn').addEventListener('click', () => {
+    Sound.init();
+    Sound.ui();
+    resetGame();
+    game.state = 'playing';
+    showOverlay(null);
+  });
+
+  // -- LIKE SYSTEM ------------------------------------------------------
+  const VOTE_API = 'https://casoual.games/api/votes';
+  let hasLiked = !!localStorage.getItem('boop-liked');
+
+  function updateLikeBtn() {
+    const lb = document.getElementById('like-btn');
     if (hasLiked) {
-      const lb = document.getElementById('like-btn');
       lb.classList.add('liked');
-      lb.textContent = '♥ Liked!';
+      lb.innerHTML = '&#9829; Liked!';
     }
-    function markLiked() {
-      hasLiked = true;
-      localStorage.setItem('boop-liked', '1');
-      const lb = document.getElementById('like-btn');
-      lb.classList.add('liked');
-      lb.textContent = '♥ Liked!';
+  }
+  updateLikeBtn();
+
+  document.getElementById('like-btn').addEventListener('click', () => {
+    if (hasLiked) return;
+    Sound.ui();
+    fetch(VOTE_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ game: 'boop' })
+    }).then(r => r.json()).then(data => {
+      if (!data.error || data.error === 'Already voted today') {
+        hasLiked = true;
+        localStorage.setItem('boop-liked', '1');
+        updateLikeBtn();
+      }
+    }).catch(() => {});
+  });
+
+  // -- VISIBILITY CHANGE ------------------------------------------------
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      // Pause is handled by delta time cap
+    } else {
+      if (Sound.ctx) Sound.ctx.resume();
     }
-    function likeGame() {
-      if (hasLiked) return;
-      fetch(VOTE_API, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ game: 'boop' })
-      }).then(r => r.json()).then(data => {
-        if (!data.error || data.error === 'Already voted today') markLiked();
-      }).catch(() => {});
+  });
+
+  // -- RENDERING --------------------------------------------------------
+  function drawBubble(b, time) {
+    const t = b.spawnTime;
+    const spawnT = Math.min(t / 0.2, 1);
+    const scale = spawnT < 1 ? ease.outBack(spawnT) : 1;
+
+    // Pulsing glow
+    const pulse = Math.sin(time * 3 + b.glowPhase) * 0.15 + 0.85;
+    const r = b.radius * scale;
+    if (r < 1) return;
+
+    // Wobble x
+    const wobbleX = Math.sin(time * b.wobbleSpeed + b.wobblePhase) * 8;
+
+    const bx = b.x + wobbleX;
+    const by = b.y;
+
+    ctx.save();
+    ctx.translate(bx, by);
+
+    // Outer glow
+    ctx.shadowBlur = 18 * pulse;
+    ctx.shadowColor = b.color.hex;
+
+    // Main circle with gradient
+    const grad = ctx.createRadialGradient(-r * 0.3, -r * 0.3, r * 0.1, 0, 0, r);
+    grad.addColorStop(0, `rgba(${b.color.r + 60},${b.color.g + 60},${b.color.b + 60},0.95)`);
+    grad.addColorStop(0.5, b.color.hex);
+    grad.addColorStop(1, `rgba(${Math.floor(b.color.r * 0.6)},${Math.floor(b.color.g * 0.6)},${Math.floor(b.color.b * 0.6)},0.9)`);
+
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(0, 0, r, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.shadowBlur = 0;
+
+    // Inner highlight
+    ctx.globalAlpha = 0.35;
+    const hlGrad = ctx.createRadialGradient(-r * 0.25, -r * 0.3, r * 0.05, -r * 0.15, -r * 0.2, r * 0.55);
+    hlGrad.addColorStop(0, 'rgba(255,255,255,0.7)');
+    hlGrad.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = hlGrad;
+    ctx.beginPath();
+    ctx.arc(0, 0, r, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.globalAlpha = 1;
+    ctx.restore();
+
+    // Store render position for hit testing
+    b._renderX = bx;
+    b._renderY = by;
+  }
+
+  function drawPopAnimation(b, time) {
+    if (!b.popActive) return;
+    const t = b.popAnim;
+    if (t >= 1) { b.popActive = false; return; }
+
+    const scale = 1 + ease.outCubic(t) * 1.5;
+    const alpha = 1 - ease.outCubic(t);
+    const r = b.radius * scale;
+
+    ctx.globalAlpha = alpha * 0.5;
+    ctx.strokeStyle = b.color.hex;
+    ctx.lineWidth = 3 * (1 - t);
+    ctx.shadowBlur = 12 * alpha;
+    ctx.shadowColor = b.color.hex;
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, r, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+    ctx.globalAlpha = 1;
+  }
+
+  function drawHUD(time) {
+    // Score
+    ctx.fillStyle = '#e8e8e8';
+    ctx.font = 'bold 28px "Segoe UI", system-ui, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText(game.score, 20, 44);
+
+    // Lives
+    for (let i = 0; i < MAX_LIVES; i++) {
+      const lx = W - 20 - (MAX_LIVES - i) * 22;
+      const ly = 36;
+      ctx.globalAlpha = i < game.lives ? 1 : 0.2;
+      ctx.fillStyle = '#ff6b6b';
+      ctx.shadowBlur = i < game.lives ? 8 : 0;
+      ctx.shadowColor = '#ff6b6b';
+      ctx.beginPath();
+      ctx.arc(lx, ly, 7, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+    ctx.globalAlpha = 1;
+
+    // Target indicator
+    const tY = 76;
+    const tR = 26;
+    const tPulse = game.targetPulse > 0 ? (1 + ease.outElastic(1 - game.targetPulse) * 0.3) : 1;
+
+    // "TAP" label
+    ctx.fillStyle = 'rgba(255,255,255,0.35)';
+    ctx.font = '12px "Segoe UI", system-ui, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('TAP THIS COLOR', W / 2, tY - tR - 10);
+
+    // Target circle
+    if (game.targetColor) {
+      const tc = game.targetColor;
+      ctx.shadowBlur = 16 + Math.sin(time * 4) * 6;
+      ctx.shadowColor = tc.hex;
+
+      const tGrad = ctx.createRadialGradient(-tR * 0.2 + W / 2, tY - tR * 0.2, tR * 0.1, W / 2, tY, tR * tPulse);
+      tGrad.addColorStop(0, `rgba(${tc.r + 60},${tc.g + 60},${tc.b + 60},1)`);
+      tGrad.addColorStop(0.6, tc.hex);
+      tGrad.addColorStop(1, `rgba(${Math.floor(tc.r * 0.7)},${Math.floor(tc.g * 0.7)},${Math.floor(tc.b * 0.7)},1)`);
+
+      ctx.fillStyle = tGrad;
+      ctx.beginPath();
+      ctx.arc(W / 2, tY, tR * tPulse, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      // Border ring
+      ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(W / 2, tY, tR * tPulse + 4, 0, Math.PI * 2);
+      ctx.stroke();
     }
 
-    // Prevent scroll / zoom on mobile
-    document.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
+    // Combo display
+    if (game.combo >= 3) {
+      const comboText = `${game.combo}x COMBO`;
+      const comboAlpha = Math.min(1, (game.combo - 2) * 0.3);
+      ctx.globalAlpha = comboAlpha * 0.8;
+      ctx.fillStyle = game.targetColor ? game.targetColor.hex : '#fff';
+      ctx.font = 'bold 16px "Segoe UI", system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      const comboScale = 1 + Math.sin(time * 6) * 0.05;
+      ctx.save();
+      ctx.translate(W / 2, tY + tR + 22);
+      ctx.scale(comboScale, comboScale);
+      ctx.fillText(comboText, 0, 0);
+      ctx.restore();
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  function drawBackground(time) {
+    // Dark background
+    ctx.fillStyle = BG;
+    ctx.fillRect(0, 0, W, H);
+
+    // Subtle gradient atmosphere - coral/violet signature
+    const atmGrad = ctx.createRadialGradient(W * 0.3, H * 0.2, 0, W * 0.5, H * 0.5, H * 0.8);
+    atmGrad.addColorStop(0, 'rgba(255,107,107,0.03)');
+    atmGrad.addColorStop(0.5, 'rgba(168,85,247,0.02)');
+    atmGrad.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = atmGrad;
+    ctx.fillRect(0, 0, W, H);
+
+    // Vignette
+    const vig = ctx.createRadialGradient(W / 2, H / 2, H * 0.25, W / 2, H / 2, H * 0.7);
+    vig.addColorStop(0, 'rgba(0,0,0,0)');
+    vig.addColorStop(1, 'rgba(0,0,0,0.4)');
+    ctx.fillStyle = vig;
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  function drawFlash() {
+    if (game.flashAlpha > 0.005) {
+      ctx.globalAlpha = game.flashAlpha;
+      ctx.fillStyle = game.flashColor;
+      ctx.fillRect(0, 0, W, H);
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  // -- AMBIENT PARTICLES ------------------------------------------------
+  function spawnAmbientParticle() {
+    emitParticles(
+      Math.random() * W,
+      H + 10,
+      1,
+      {
+        speed: 20, upward: 40 + Math.random() * 30, life: 3, lifeVar: 2,
+        size: 1.5, sizeVar: 1.5, gravity: -15,
+        colors: ['rgba(255,107,107,0.15)', 'rgba(168,85,247,0.12)', 'rgba(255,255,255,0.08)']
+      }
+    );
+  }
+
+  // -- MAIN GAME LOOP ---------------------------------------------------
+  let lastTime = 0;
+  let gameTime = 0;
+
+  function update(dt, time) {
+    game.elapsed += dt;
+
+    // Spawn bubbles
+    game.spawnTimer -= dt;
+    if (game.spawnTimer <= 0) {
+      game.spawnTimer = getSpawnInterval();
+      spawnBubble();
+    }
+
+    // Update speed
+    game.speedMult = getSpeedMult();
+
+    // Ambient particles
+    game.ambientTimer -= dt;
+    if (game.ambientTimer <= 0) {
+      game.ambientTimer = 0.4 + Math.random() * 0.3;
+      spawnAmbientParticle();
+    }
+
+    // Update bubbles
+    for (let i = 0; i < MAX_BUBBLES; i++) {
+      const b = bubbles[i];
+      if (!b.active) continue;
+
+      b.y += b.speed * dt;
+      b.spawnTime += dt;
+
+      // Near-miss detection: target color bubble about to leave screen
+      if (!b.nearMissTriggered && b.color === game.targetColor && b.y > H - b.radius * 4 && b.y < H - b.radius) {
+        b.nearMissTriggered = true;
+        Sound.miss();
+        // Flash warning
+        game.flashAlpha = Math.max(game.flashAlpha, 0.08);
+        game.flashColor = b.color.hex;
+      }
+
+      // Off screen
+      if (b.y > H + b.radius) {
+        if (b.color === game.targetColor) {
+          missTarget(b);
+        }
+        b.active = false;
+      }
+    }
+  }
+
+  function render(time) {
+    ctx.save();
+
+    // Apply camera shake
+    ctx.translate(camera.shakeX, camera.shakeY);
+
+    drawBackground(time);
+
+    // Draw bubbles
+    for (let i = 0; i < MAX_BUBBLES; i++) {
+      if (bubbles[i].active) drawBubble(bubbles[i], time);
+    }
+
+    // Draw pop animations
+    for (let i = 0; i < MAX_BUBBLES; i++) {
+      if (bubbles[i].popActive) drawPopAnimation(bubbles[i], time);
+    }
+
+    // Particles (additive blending for energy)
+    ctx.globalCompositeOperation = 'lighter';
+    renderParticles();
+    ctx.globalCompositeOperation = 'source-over';
+
+    // Score floats
+    renderFloats();
+
+    // Screen flash
+    drawFlash();
+
+    // HUD (drawn last, always sharp)
+    if (game.state === 'playing') {
+      drawHUD(time);
+    }
+
+    ctx.restore();
+  }
+
+  // -- MAIN LOOP --------------------------------------------------------
+  function mainLoop(timestamp) {
+    const rawDt = lastTime ? (timestamp - lastTime) / 1000 : 0;
+    lastTime = timestamp;
+    const cappedDt = Math.min(rawDt, 0.1);
+
+    // Hit stop
+    if (game.hitStopTimer > 0) {
+      game.hitStopTimer -= cappedDt;
+      render(gameTime);
+      requestAnimationFrame(mainLoop);
+      return;
+    }
+
+    // Time dilation
+    if (game.dilationTimer > 0) {
+      game.dilationTimer -= cappedDt;
+      if (game.dilationTimer <= 0) game.timeDilation = 1;
+    }
+
+    const dt = cappedDt * game.timeDilation;
+    gameTime += dt;
+
+    if (game.state === 'playing') {
+      update(dt, gameTime);
+    } else {
+      // Ambient particles on menu/game-over
+      game.ambientTimer -= cappedDt;
+      if (game.ambientTimer <= 0) {
+        game.ambientTimer = 0.3 + Math.random() * 0.5;
+        spawnAmbientParticle();
+      }
+    }
+
+    // Always update visual effects
+    camera.update(cappedDt);
+    updateParticles(cappedDt);
+    updateFloats(cappedDt);
+
+    // Decay flash
+    game.flashAlpha *= Math.pow(0.02, cappedDt);
+
+    // Decay target pulse
+    if (game.targetPulse > 0) {
+      game.targetPulse = Math.max(0, game.targetPulse - cappedDt * 4);
+    }
+
+    // Pop animations
+    for (let i = 0; i < MAX_BUBBLES; i++) {
+      if (bubbles[i].popActive) {
+        bubbles[i].popAnim += cappedDt * 3;
+        if (bubbles[i].popAnim >= 1) bubbles[i].popActive = false;
+      }
+    }
+
+    render(gameTime);
+    requestAnimationFrame(mainLoop);
+  }
+
+  requestAnimationFrame(mainLoop);
+
   </script>
-
 </body>
 </html>
