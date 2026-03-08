@@ -7,6 +7,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Boop!</title>
   <link rel="manifest" href="manifest.json">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7283526525669150" crossorigin="anonymous"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -171,6 +172,15 @@
       font-weight: 700;
     }
 
+    /* ── AD ── */
+    .ad-container {
+      margin: 16px 0;
+      min-height: 250px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
     /* ── EFFECTS ── */
     .pop-effect {
       position: absolute;
@@ -237,6 +247,13 @@
     <p class="final-score-label">Score</p>
     <p class="final-score" id="final-score">0</p>
     <p class="new-best" id="new-best" style="display:none">NEW BEST!</p>
+    <div class="ad-container" id="ad-container">
+      <ins class="adsbygoogle"
+           style="display:block;max-width:300px;height:250px"
+           data-ad-client="ca-pub-7283526525669150"
+           data-ad-format="auto"
+           data-full-width-responsive="true"></ins>
+    </div>
     <button class="btn" id="retry-btn">Play Again</button>
     <p class="best-score" id="gameover-best"></p>
   </div>
@@ -491,7 +508,10 @@
       $('new-best').style.display = isNewBest ? 'block' : 'none';
       updateBestDisplay();
 
-      setTimeout(() => showScreen('over'), 500);
+      setTimeout(() => {
+        showScreen('over');
+        try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch(e) {}
+      }, 500);
     }
 
     // Prevent scroll / zoom on mobile
