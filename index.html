@@ -566,6 +566,13 @@
       lb.classList.add('liked');
       lb.textContent = '♥ Liked!';
     }
+    function markLiked() {
+      hasLiked = true;
+      localStorage.setItem('boop-liked', '1');
+      const lb = document.getElementById('like-btn');
+      lb.classList.add('liked');
+      lb.textContent = '♥ Liked!';
+    }
     function likeGame() {
       if (hasLiked) return;
       fetch(VOTE_API, {
@@ -573,13 +580,7 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ game: 'boop' })
       }).then(r => r.json()).then(data => {
-        if (!data.error) {
-          hasLiked = true;
-          localStorage.setItem('boop-liked', '1');
-          const lb = document.getElementById('like-btn');
-          lb.classList.add('liked');
-          lb.textContent = '♥ Liked!';
-        }
+        if (!data.error || data.error === 'Already voted today') markLiked();
       }).catch(() => {});
     }
 
